@@ -2,6 +2,7 @@
 name = "karaok-library"
 version.workspace = true
 edition.workspace = true
+license.workspace = true
 
 [dependencies]
 karaok-types.workspace = true

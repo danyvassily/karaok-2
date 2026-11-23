@@ -12,6 +12,8 @@
     <string>1</string>
     <key>CFBundleShortVersionString</key>
     <string>0.1.0</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2026 Karaok Party Contributors — Licence MIT</string>
     <key>CFBundleExecutable</key>
     <string>KaraokParty</string>
     <key>CFBundlePackageType</key>

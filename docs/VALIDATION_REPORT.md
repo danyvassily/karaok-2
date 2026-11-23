@@ -2,7 +2,7 @@
 
 - **Date** : 2026-11-23
 - **Environnement de mesure** : Apple M3 (`arm64`), macOS 27.3 (`26C5035r`), `rustc 1.94.1`, `Swift 6.4.2`, `Xcode 27.2`
-- **Branche locale** : `feat/karaok-party-v1` (non publiée sur distant)
+- **Branche** : `feat/karaok-party-v1` (licence MIT validée — [ADR-0005](decisions/0005-license-proposal-and-dependencies.md))
 
 Conformément au [MASTER_PROMPT.md](../MASTER_PROMPT.md), chaque affirmation ci-dessous est qualifiée (**Fait vérifié**, **Mesuré**, **Décision**, **Hypothèse**, **À valider**).
 
@@ -51,7 +51,7 @@ Protocole : exécuté en mode `--release` via `./rust/target/release/karaok-cli 
 | AC-09, AC-10, AC-11 (LRC/UTF-8, offset, placement manuel, 4–5 blocs, horloge musique) | **Fait vérifié (moteur/parser) / À valider (interaction GUI)** | Tests `karaok-lyrics` et `karaok-audio-engine` (silence micro ne bloque jamais la timeline, seek immédiat après `load_track`, reprise après fin de morceau, ordre chronologique garanti). Rendu visuel plein écran et défilement à 200 % dans le GUI macOS restent **À valider** visuellement. |
 | AC-13, AC-14 (vraie correction de justesse, non-voisé préservé, presets, bypass, limiteur) | **Mesuré (signaux synthétiques) / À valider (écoute voix réelles)** | Correction `431,0 Hz → 440,07 Hz` mesurée, bruit non voisé préservé, grains indépendants A/B sans clic, limiteur peak-hold lookahead vérifié. Écoute humaine AB sur voix réelles (graves/aiguës/vibrato/formants) reste **À valider**. |
 | AC-15, AC-16 (dérive horloge, resampling multi-fréquences, profil latence) | **Mesuré (simulé) / À valider (matériel)** | Resampling 16 kHz→48 kHz + dérive `+100 ppm` (120 s) et `+50 ppm` (30 000 blocs) stabilisés avec 0 underrun. Mesure acoustique en boucle et endurance 60 min Core Audio RT restent **À valider**. |
-| AC-20, AC-21, AC-22 (accessibilité, erreurs actionnables, licences/notices) | **Partiellement vérifié (audit code + notices) / À valider (VoiceOver réel & LICENSE)** | Raccourci `Espace` isolé hors champs texte, `Échap` plein écran, libellés/unités VoiceOver sur curseurs, indicateurs non basés sur la couleur seule, `THIRD_PARTY_NOTICES.md` vérifié. Test manuel VoiceOver/contraste et choix définitif de `LICENSE` par le propriétaire (ADR-0005) restent **À valider**. |
+| AC-20, AC-21, AC-22 (accessibilité, erreurs actionnables, licences/notices) | **Fait vérifié (licence MIT & notices) / À valider (VoiceOver réel)** | Raccourci `Espace` isolé hors champs texte, `Échap` plein écran, libellés/unités VoiceOver sur curseurs, indicateurs non basés sur la couleur seule, licence **MIT** (`LICENSE` + `Cargo.toml` + `ADR-0005` Accepté) et `THIRD_PARTY_NOTICES.md` vérifiés. Test manuel VoiceOver/contraste reste **À valider**. |
 | AC-23, AC-24 (P1 transposition morceau, Spotify/YouTube hors cœur) | **Décision respectée** | Transposition P1 non livrée (aucun contrôle factice) ; aucune intégration Spotify/YouTube introduite. |
 
 ---
@@ -60,5 +60,4 @@ Protocole : exécuté en mode `--release` via `./rust/target/release/karaok-cli 
 
 1. **Essai matériel physique P-01 / P-02** : brancher le **Nothing Headphone (a) en USB-C**, confirmer sa détection dans **Son**, tester la capture mono 48 kHz + sortie stéréo 48 kHz, débrancher/rebrancher à chaud et relever la latence acoustique mesurée (p50/p95/p99) ainsi qu'une session d'endurance 60 minutes.
 2. **Test interactif GUI & accessibilité macOS** : ouvrir `build/KaraokParty.app`, valider le dialogue système de permission microphone, tester VoiceOver, texte 200 %, Réduire les animations, saisie d'espaces dans les champs texte vs `Espace` lecture/pause, `Échap` plein écran et l'écoute humaine des préréglages **Naturel / Studio / Scène**.
-3. **Décision de licence (`LICENSE`)** : valider l'[ADR-0005](decisions/0005-license-proposal-and-dependencies.md) et ajouter le fichier `LICENSE` à la racine avant toute distribution publique.
-4. **Modèles neuronaux optionnels** : évaluer et approuver explicitement un manifeste ONNX (poids + licence + SHA-256) si une séparation neuronale supérieure à la séparation spectrale DSP locale est souhaitée.
+3. **Modèles neuronaux optionnels** : évaluer et approuver explicitement un manifeste ONNX (poids + licence + SHA-256) si une séparation neuronale supérieure à la séparation spectrale DSP locale est souhaitée.

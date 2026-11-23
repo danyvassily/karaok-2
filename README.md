@@ -4,8 +4,8 @@ Application de karaoké **macOS**, gratuite et open source : moteur audio temps 
 
 ## État réel du projet (2026-11-23)
 
-- **Implémenté et vérifié localement (`Fait vérifié` / `Mesuré`)** : workspace Rust (13 crates, 34/34 tests, `cargo clippy -D warnings` propre), application macOS `build/KaraokParty.app` signée localement ad-hoc (`com.apple.security.device.audio-input`), énumération Core Audio HAL vérifiée sur Apple M3, correction de justesse live mesurée (`431,0 Hz → 440,07 Hz`, charge `p99 = 4,28 %` du budget bloc à 48 kHz / 256 frames, `0` overrun sur 30 000 blocs simulés).
-- **Reste à valider (`À valider`)** : essai matériel physique avec le casque **Nothing Headphone (a) en USB-C** (non connecté lors de la construction), mesure de latence acoustique en boucle, test interactif VoiceOver/GUI macOS, et validation par le propriétaire du fichier `LICENSE` (voir [ADR-0005](docs/decisions/0005-license-proposal-and-dependencies.md)).
+- **Implémenté et vérifié localement (`Fait vérifié` / `Mesuré`)** : workspace Rust (13 crates, 34/34 tests, `cargo clippy -D warnings` propre), application macOS `build/KaraokParty.app` signée localement ad-hoc (`com.apple.security.device.audio-input`), licence open source **MIT** ([LICENSE](LICENSE), [ADR-0005](docs/decisions/0005-license-proposal-and-dependencies.md)), énumération Core Audio HAL vérifiée sur Apple M3, correction de justesse live mesurée (`431,0 Hz → 440,07 Hz`, charge `p99 = 4,28 %` du budget bloc à 48 kHz / 256 frames, `0` overrun sur 30 000 blocs simulés).
+- **Reste à valider (`À valider`)** : essai matériel physique avec le casque **Nothing Headphone (a) en USB-C** (non connecté lors de la construction), mesure de latence acoustique en boucle, et test interactif VoiceOver/GUI macOS.
 
 ## Démarrage rapide (macOS local)
 
@@ -34,5 +34,6 @@ Voir [docs/INSTALLATION_MACOS.md](docs/INSTALLATION_MACOS.md) pour le détail de
 - [Rapport de validation et mesures réelles](docs/VALIDATION_REPORT.md)
 - [Journal des décisions d'architecture (ADR)](docs/decisions/README.md)
 - [Notices des dépendances tierces](THIRD_PARTY_NOTICES.md)
+- [Licence MIT](LICENSE)
 
 Hors périmètre garanti : micro iPhone, app iOS, QR code, WebRTC, serveur de signalisation, extraction de flux Spotify/YouTube.

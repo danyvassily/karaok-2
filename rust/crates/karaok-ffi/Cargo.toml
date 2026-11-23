@@ -2,6 +2,7 @@
 name = "karaok-ffi"
 version.workspace = true
 edition.workspace = true
+license.workspace = true
 
 [lib]
 name = "karaok_ffi"
