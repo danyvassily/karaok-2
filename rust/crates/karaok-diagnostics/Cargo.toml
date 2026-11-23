@@ -1,0 +1,10 @@
+[package]
+name = "karaok-diagnostics"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+karaok-types.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true

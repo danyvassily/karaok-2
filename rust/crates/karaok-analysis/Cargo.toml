@@ -1,0 +1,22 @@
+[package]
+name = "karaok-analysis"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+karaok-types.workspace = true
+karaok-media.workspace = true
+karaok-lyrics.workspace = true
+karaok-voice-dsp.workspace = true
+karaok-library.workspace = true
+karaok-model-store.workspace = true
+hound.workspace = true
+rustfft.workspace = true
+sha2.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

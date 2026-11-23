@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>Karaok Party</string>
+    <key>CFBundleDisplayName</key>
+    <string>Karaok Party</string>
+    <key>CFBundleIdentifier</key>
+    <string>org.karaokparty.macos</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0.1.0</string>
+    <key>CFBundleExecutable</key>
+    <string>KaraokParty</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>fr</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>14.0</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Karaok Party utilise le microphone que vous sélectionnez (par exemple votre Nothing Headphone (a) en USB-C) pour appliquer localement la correction de justesse et la réverbération en temps réel. Aucun audio n'est envoyé sur Internet.</string>
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>Audio MP3 / WAV</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.mp3</string>
+                <string>com.microsoft.waveform-audio</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>

@@ -1,0 +1,21 @@
+# Rust build artifacts
+/rust/target/
+**/*.rs.bk
+
+# Swift / macOS build artifacts
+/mac-app/.build/
+/mac-app/.swiftpm/
+/build/
+*.app/
+*.dSYM/
+*.xcuserstate
+.DS_Store
+
+# Local user data / test artifacts (never commit user audio or personal logs)
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.wav
+*.mp3
+/local-data/
+/diagnostics-export/

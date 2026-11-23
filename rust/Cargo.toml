@@ -1,0 +1,61 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/karaok-types",
+    "crates/karaok-diagnostics",
+    "crates/karaok-lyrics",
+    "crates/karaok-voice-dsp",
+    "crates/karaok-media",
+    "crates/karaok-library",
+    "crates/karaok-model-store",
+    "crates/karaok-audio-device",
+    "crates/karaok-audio-engine",
+    "crates/karaok-analysis",
+    "crates/karaok-controller",
+    "crates/karaok-ffi",
+    "crates/karaok-cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Karaok Party Contributors"]
+rust-version = "1.80"
+
+[workspace.dependencies]
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.154"
+uuid = { version = "=1.29.3", features = ["v4", "serde"] }
+thiserror = "=2.0.21"
+chrono = { version = "=0.4.45", features = ["serde"] }
+sha2 = "=0.10.9"
+crossbeam-channel = "=0.5.17"
+rtrb = "=0.4.1"
+rustfft = "=6.4.1"
+rusqlite = { version = "=0.32.1", features = ["bundled"] }
+symphonia = { version = "=0.5.4", default-features = false, features = ["mp3", "wav", "pcm"] }
+hound = "=3.5.1"
+dirs = "=7.0.0"
+tempfile = "=3.27.0"
+libc = "=0.2.191"
+coreaudio-sys = { version = "=0.2.18", default-features = false, features = ["core_audio", "audio_unit", "audio_toolbox"] }
+core-foundation-sys = "=0.8.7"
+
+karaok-types = { path = "crates/karaok-types" }
+karaok-diagnostics = { path = "crates/karaok-diagnostics" }
+karaok-lyrics = { path = "crates/karaok-lyrics" }
+karaok-voice-dsp = { path = "crates/karaok-voice-dsp" }
+karaok-media = { path = "crates/karaok-media" }
+karaok-library = { path = "crates/karaok-library" }
+karaok-model-store = { path = "crates/karaok-model-store" }
+karaok-audio-device = { path = "crates/karaok-audio-device" }
+karaok-audio-engine = { path = "crates/karaok-audio-engine" }
+karaok-analysis = { path = "crates/karaok-analysis" }
+karaok-controller = { path = "crates/karaok-controller" }
+karaok-ffi = { path = "crates/karaok-ffi" }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "unwind"

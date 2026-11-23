@@ -1,0 +1,4 @@
+module CKaraokFFI [system] {
+    header "include/karaok_ffi.h"
+    export *
+}

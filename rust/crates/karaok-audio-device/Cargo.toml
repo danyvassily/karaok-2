@@ -1,0 +1,14 @@
+[package]
+name = "karaok-audio-device"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+karaok-types.workspace = true
+karaok-audio-engine.workspace = true
+crossbeam-channel.workspace = true
+libc.workspace = true
+
+[target.'cfg(target_os = "macos")'.dependencies]
+coreaudio-sys.workspace = true
+core-foundation-sys.workspace = true

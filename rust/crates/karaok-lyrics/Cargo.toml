@@ -1,0 +1,11 @@
+[package]
+name = "karaok-lyrics"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+karaok-types.workspace = true
+serde.workspace = true
+sha2.workspace = true
+uuid.workspace = true
+chrono.workspace = true

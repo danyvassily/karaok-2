@@ -1,0 +1,15 @@
+[package]
+name = "karaok-cli"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+karaok-types.workspace = true
+karaok-diagnostics.workspace = true
+karaok-voice-dsp.workspace = true
+karaok-audio-device.workspace = true
+karaok-audio-engine.workspace = true
+karaok-media.workspace = true
+karaok-analysis.workspace = true
+serde_json.workspace = true
+uuid.workspace = true

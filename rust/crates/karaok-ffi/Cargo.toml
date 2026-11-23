@@ -1,0 +1,19 @@
+[package]
+name = "karaok-ffi"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+name = "karaok_ffi"
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+karaok-types.workspace = true
+karaok-library.workspace = true
+karaok-audio-device.workspace = true
+karaok-controller.workspace = true
+serde_json.workspace = true
+libc.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

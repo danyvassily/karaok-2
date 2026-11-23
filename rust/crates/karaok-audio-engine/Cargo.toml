@@ -1,0 +1,15 @@
+[package]
+name = "karaok-audio-engine"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+karaok-types.workspace = true
+karaok-diagnostics.workspace = true
+karaok-voice-dsp.workspace = true
+rtrb.workspace = true
+hound.workspace = true
+crossbeam-channel.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
