@@ -21,7 +21,7 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Karaok Party Contributors"]
 license = "MIT"
-rust-version = "1.80"
+rust-version = "1.88"
 
 [workspace.dependencies]
 serde = { version = "=1.0.229", features = ["derive"] }
@@ -60,3 +60,11 @@ opt-level = 3
 lto = "thin"
 codegen-units = 1
 panic = "unwind"
+
+# Do not apply the application's aggressive release profile to build scripts
+# and procedural macros. On recent Rust toolchains, optimising the
+# `rustversion` proc-macro this way can make dependent build scripts fail to
+# load it (E0463) before Karaok Party itself is compiled.
+[profile.release.build-override]
+opt-level = 0
+codegen-units = 1

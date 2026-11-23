@@ -5,7 +5,7 @@ Ce guide documente le chemin légitime de compilation, d'exécution locale et de
 ## Prérequis vérifiés
 
 - **macOS 14.0+** (validé sur Apple Silicon `arm64`, macOS 27.3 / Apple M3)
-- **Rust & Cargo** (`rustc 1.80+`, testé avec `rustc 1.94.1`)
+- **Rust & Cargo** (`rustc 1.88+`, minimum réel des dépendances verrouillées ; testé avec `rustc 1.94.1`)
 - **Xcode / Command Line Tools** (`swift 6.0+`, testé avec Swift 6.4.2 / Xcode 27.2)
 
 Aucun compte Apple Developer payant n'est requis pour compiler et exécuter localement. Aucune désactivation de Gatekeeper ou de SIP n'est demandée ni recommandée.
@@ -21,6 +21,12 @@ Le script :
 2. compile le moteur temps réel Rust et la bibliothèque statique `libkaraok_ffi.a` en mode `--release` ainsi que l'outil CLI `karaok-cli` ;
 3. compile l'application native SwiftUI `KaraokParty` en mode `release` liée statiquement au moteur Rust ;
 4. assemble `build/KaraokParty.app` avec `Info.plist` (justification microphone française `NSMicrophoneUsageDescription`) et applique une signature ad-hoc locale portant uniquement l'entitlement `com.apple.security.device.audio-input`.
+
+Si le dépôt se trouve dans un dossier géré par iCloud Drive ou un autre File Provider et que `codesign` refuse des métadonnées Finder réinjectées automatiquement, construisez l'artefact hors de ce dossier sans désactiver Gatekeeper :
+
+```bash
+KARAOK_BUILD_DIR=/private/tmp/karaok-party-build ./scripts/build-app.sh
+```
 
 ## Lancer l'application
 

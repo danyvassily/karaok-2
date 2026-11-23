@@ -170,11 +170,20 @@ pub enum ControllerCommand {
         track_id: Uuid,
         #[serde(default)]
         use_stems: Option<bool>,
+        /// Monotonic client request generation. Older concurrent loads are
+        /// rejected before they can replace or restart a newer selection.
+        #[serde(default)]
+        request_generation: Option<u64>,
     },
-    Play,
+    Play {
+        #[serde(default)]
+        request_generation: Option<u64>,
+    },
     Pause,
     Seek {
         position_s: f64,
+        #[serde(default)]
+        request_generation: Option<u64>,
     },
     ListModels,
     ImportVerifiedModel {
@@ -216,6 +225,7 @@ pub struct AppController {
     input_stream: Mutex<Option<Box<dyn ActiveStreamHandle>>>,
     active_input_uid: Mutex<Option<String>>,
     loaded_track_id: Mutex<Option<Uuid>>,
+    latest_playback_request: AtomicU64,
 
     active_jobs: Mutex<HashMap<Uuid, Arc<AtomicBool>>>,
     event_tx: Sender<AppEvent>,
@@ -265,6 +275,7 @@ impl AppController {
             input_stream: Mutex::new(None),
             active_input_uid: Mutex::new(None),
             loaded_track_id: Mutex::new(None),
+            latest_playback_request: AtomicU64::new(0),
             active_jobs: Mutex::new(HashMap::new()),
             event_tx,
             event_rx,
@@ -660,9 +671,9 @@ impl AppController {
 
         // Preserve loaded track and source position across route reconfiguration (§5.5, B7)
         if let Some(tid) = prev_track {
-            let _ = self.load_track_for_playback(tid, None);
+            let _ = self.load_track_for_playback(tid, None, None);
             if prev_pos > 0.05 {
-                let _ = self.seek(prev_pos);
+                let _ = self.seek(prev_pos, None);
             }
         }
 
@@ -1043,7 +1054,17 @@ impl AppController {
         &self,
         track_id: Uuid,
         use_stems_override: Option<bool>,
+        request_generation: Option<u64>,
     ) -> KaraokResult<TransportSnapshot> {
+        if let Some(generation) = request_generation {
+            let previous = self
+                .latest_playback_request
+                .fetch_max(generation, Ordering::AcqRel);
+            if generation < previous {
+                return Err(stale_playback_request_error());
+            }
+        }
+
         let (track, pcm_art, voc_art, acc_art) = {
             let store = self.store.lock().map_err(|_| {
                 KaraokError::new(ErrorCode::InternalError, "Base de données occupée.")
@@ -1087,6 +1108,11 @@ impl AppController {
             .map(|a| PathBuf::from(a.file_path))
             .filter(|p| p.exists());
 
+        // Decoding a missing canonical WAV can be slow. A newer UI request
+        // may have arrived while this one was preparing the file, so verify
+        // again before mutating preferences, loaded-track state, or engine.
+        self.ensure_current_playback_request(request_generation)?;
+
         if let Some(use_stems) = use_stems_override {
             if let Ok(mut pref) = self.preference.lock() {
                 pref.mix.use_stems = use_stems;
@@ -1123,7 +1149,8 @@ impl AppController {
         Ok(eng.state().read_transport())
     }
 
-    pub fn play(&self) -> KaraokResult<TransportSnapshot> {
+    pub fn play(&self, request_generation: Option<u64>) -> KaraokResult<TransportSnapshot> {
+        self.ensure_current_playback_request(request_generation)?;
         let mut eng_guard = self.engine.lock().map_err(|_| {
             KaraokError::new(ErrorCode::InternalError, "Moteur audio indisponible.")
         })?;
@@ -1145,7 +1172,12 @@ impl AppController {
         Ok(eng.state().read_transport())
     }
 
-    pub fn seek(&self, position_s: f64) -> KaraokResult<TransportSnapshot> {
+    pub fn seek(
+        &self,
+        position_s: f64,
+        request_generation: Option<u64>,
+    ) -> KaraokResult<TransportSnapshot> {
+        self.ensure_current_playback_request(request_generation)?;
         let mut eng_guard = self.engine.lock().map_err(|_| {
             KaraokError::new(ErrorCode::InternalError, "Moteur audio indisponible.")
         })?;
@@ -1154,6 +1186,15 @@ impl AppController {
         })?;
         eng.seek(position_s);
         Ok(eng.state().read_transport())
+    }
+
+    fn ensure_current_playback_request(&self, request_generation: Option<u64>) -> KaraokResult<()> {
+        if request_generation.is_some_and(|generation| {
+            generation != self.latest_playback_request.load(Ordering::Acquire)
+        }) {
+            return Err(stale_playback_request_error());
+        }
+        Ok(())
     }
 
     /// Execute any typed `ControllerCommand` and return a structured `ControllerResponse`.
@@ -1517,10 +1558,20 @@ impl AppController {
             ControllerCommand::LoadTrackForPlayback {
                 track_id,
                 use_stems,
-            } => to_json(self.load_track_for_playback(track_id, use_stems)?),
-            ControllerCommand::Play => to_json(self.play()?),
+                request_generation,
+            } => to_json(self.load_track_for_playback(
+                track_id,
+                use_stems,
+                request_generation,
+            )?),
+            ControllerCommand::Play { request_generation } => {
+                to_json(self.play(request_generation)?)
+            }
             ControllerCommand::Pause => to_json(self.pause()?),
-            ControllerCommand::Seek { position_s } => to_json(self.seek(position_s)?),
+            ControllerCommand::Seek {
+                position_s,
+                request_generation,
+            } => to_json(self.seek(position_s, request_generation)?),
             ControllerCommand::ListModels => {
                 let ms = self.model_store.lock().map_err(|_| {
                     KaraokError::new(ErrorCode::InternalError, "Registre modèles occupé.")
@@ -1571,6 +1622,13 @@ fn to_json<T: Serialize>(value: T) -> KaraokResult<serde_json::Value> {
             format!("Sérialisation réponse échouée : {e}"),
         )
     })
+}
+
+fn stale_playback_request_error() -> KaraokError {
+    KaraokError::new(
+        ErrorCode::JobCancelled,
+        "Chargement ignoré : un morceau plus récent a été sélectionné.",
+    )
 }
 
 #[cfg(test)]
@@ -1659,6 +1717,21 @@ mod tests {
         write_stereo_f32_wav_atomic(&wav_path, sr, &pcm).unwrap();
 
         let track = ctrl.import_track(wav_path.to_str().unwrap()).unwrap();
+
+        // A superseded asynchronous UI load must never replace or restart the
+        // latest requested track (regression: Swift generation guard used to
+        // protect only UI state, not the Rust engine state).
+        ctrl.load_track_for_playback(track.id, None, Some(2))
+            .unwrap();
+        let stale_load = ctrl
+            .load_track_for_playback(track.id, None, Some(1))
+            .unwrap_err();
+        assert_eq!(stale_load.code, ErrorCode::JobCancelled);
+        let stale_play = ctrl.play(Some(1)).unwrap_err();
+        assert_eq!(stale_play.code, ErrorCode::JobCancelled);
+        ctrl.play(Some(2)).unwrap();
+        ctrl.pause().unwrap();
+
         let _ = ctrl.dispatch(ControllerCommand::SetLyricsText {
             track_id: track.id,
             raw_text: "Première ligne chantée\nDeuxième ligne lumineuse".into(),

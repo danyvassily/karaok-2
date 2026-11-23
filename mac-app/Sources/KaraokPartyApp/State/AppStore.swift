@@ -762,16 +762,27 @@ final class AppStore: ObservableObject {
         let expectedGen = loadGeneration
         isLoadingPlayback = true
 
-        var payload: [String: Any] = ["cmd": "load_track_for_playback", "track_id": trackId]
+        var payload: [String: Any] = [
+            "cmd": "load_track_for_playback",
+            "track_id": trackId,
+            "request_generation": expectedGen
+        ]
         if let useStems { payload["use_stems"] = useStems }
 
         Task.detached { [bridge] in
             do {
                 let _ = try bridge.dispatch(payload, as: AnyCodableResponse.self)
                 if let startAt, startAt > 0 {
-                    let _ = try bridge.dispatch(["cmd": "seek", "position_s": startAt], as: AnyCodableResponse.self)
+                    let _ = try bridge.dispatch([
+                        "cmd": "seek",
+                        "position_s": startAt,
+                        "request_generation": expectedGen
+                    ], as: AnyCodableResponse.self)
                 }
-                let _ = try bridge.dispatch(["cmd": "play"], as: AnyCodableResponse.self)
+                let _ = try bridge.dispatch([
+                    "cmd": "play",
+                    "request_generation": expectedGen
+                ], as: AnyCodableResponse.self)
                 let loadedDetail = try? bridge.dispatch(["cmd": "get_track_detail", "track_id": trackId], as: TrackDetailDTO.self)
                 await MainActor.run {
                     // Discard stale async completion if another track load started afterward (P2-I7)
